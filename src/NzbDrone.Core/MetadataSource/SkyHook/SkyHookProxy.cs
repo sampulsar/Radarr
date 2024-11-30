@@ -29,6 +29,7 @@ namespace NzbDrone.Core.MetadataSource.SkyHook
         private readonly Logger _logger;
 
         private readonly IHttpRequestBuilderFactory _radarrMetadata;
+        private readonly IHttpRequestBuilderFactory _whisparrMetadata;
         private readonly IConfigService _configService;
         private readonly IMovieService _movieService;
         private readonly IMovieMetadataService _movieMetadataService;
@@ -44,6 +45,7 @@ namespace NzbDrone.Core.MetadataSource.SkyHook
         {
             _httpClient = httpClient;
             _radarrMetadata = requestBuilder.RadarrMetadata;
+            _whisparrMetadata = requestBuilder.WhisparrMetadata;
             _configService = configService;
             _movieService = movieService;
             _movieMetadataService = movieMetadataService;
@@ -514,6 +516,8 @@ namespace NzbDrone.Core.MetadataSource.SkyHook
                     }
                 }
 
+                var movieResources = new List<MovieResource>();
+
                 var searchTerm = parserTitle.Replace("_", "+").Replace(" ", "+").Replace(".", "+");
 
                 var firstChar = searchTerm.First();
@@ -528,8 +532,22 @@ namespace NzbDrone.Core.MetadataSource.SkyHook
                 request.SuppressHttpError = true;
 
                 var httpResponse = _httpClient.Get<List<MovieResource>>(request);
+                movieResources.AddRange(httpResponse.Resource);
 
-                return httpResponse.Resource.SelectList(MapSearchResult);
+                // Whisparr Search
+                request = _whisparrMetadata.Create()
+                    .SetSegment("route", "search")
+                    .AddQueryParam("q", searchTerm)
+                    .AddQueryParam("year", yearTerm)
+                    .Build();
+
+                request.AllowAutoRedirect = true;
+                request.SuppressHttpError = true;
+
+                httpResponse = _httpClient.Get<List<MovieResource>>(request);
+                movieResources.AddRange(httpResponse.Resource);
+
+                return movieResources.SelectList(MapSearchResult);
             }
             catch (HttpException ex)
             {
