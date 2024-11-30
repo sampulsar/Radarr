@@ -358,6 +358,11 @@ namespace NzbDrone.Core.Parser
 
         public static string ParseImdbId(string title)
         {
+            if (title.IsNullOrWhiteSpace())
+            {
+                return string.Empty;
+            }
+
             var match = ReportImdbId.Match(title);
             if (match.Success)
             {
@@ -402,6 +407,11 @@ namespace NzbDrone.Core.Parser
 
         public static string ReplaceGermanUmlauts(string s)
         {
+            if (s.IsNullOrWhiteSpace())
+            {
+                return string.Empty;
+            }
+
             var t = s;
             t = t.Replace("ä", "ae");
             t = t.Replace("ö", "oe");
@@ -465,6 +475,11 @@ namespace NzbDrone.Core.Parser
 
         public static string CleanMovieTitle(this string title)
         {
+            if (title.IsNullOrWhiteSpace())
+            {
+                return string.Empty;
+            }
+
             // If Title only contains numbers return it as is.
             if (long.TryParse(title, out _))
             {
@@ -476,6 +491,11 @@ namespace NzbDrone.Core.Parser
 
         public static string NormalizeEpisodeTitle(this string title)
         {
+            if (title.IsNullOrWhiteSpace())
+            {
+                return string.Empty;
+            }
+
             title = SpecialEpisodeWordRegex.Replace(title, string.Empty);
             title = PunctuationRegex.Replace(title, " ");
             title = DuplicateSpacesRegex.Replace(title, " ");
@@ -486,6 +506,11 @@ namespace NzbDrone.Core.Parser
 
         public static string NormalizeTitle(this string title)
         {
+            if (title.IsNullOrWhiteSpace())
+            {
+                return string.Empty;
+            }
+
             title = WordDelimiterRegex.Replace(title, " ");
             title = PunctuationRegex.Replace(title, string.Empty);
             title = CommonWordRegex.Replace(title, string.Empty);
@@ -497,11 +522,21 @@ namespace NzbDrone.Core.Parser
 
         public static string SimplifyReleaseTitle(this string title)
         {
+            if (title.IsNullOrWhiteSpace())
+            {
+                return string.Empty;
+            }
+
             return SimpleReleaseTitleRegex.Replace(title, string.Empty);
         }
 
         public static string ParseHardcodeSubs(string title)
         {
+            if (title.IsNullOrWhiteSpace())
+            {
+                return string.Empty;
+            }
+
             var subMatch = HardcodedSubsRegex.Matches(title).OfType<Match>().LastOrDefault();
 
             if (subMatch != null && subMatch.Success)
@@ -521,6 +556,11 @@ namespace NzbDrone.Core.Parser
 
         public static string ParseReleaseGroup(string title)
         {
+            if (title.IsNullOrWhiteSpace())
+            {
+                return string.Empty;
+            }
+
             title = title.Trim();
             title = RemoveFileExtension(title);
             title = WebsitePrefixRegex.Replace(title);
@@ -573,6 +613,11 @@ namespace NzbDrone.Core.Parser
 
         public static string RemoveFileExtension(string title)
         {
+            if (title.IsNullOrWhiteSpace())
+            {
+                return string.Empty;
+            }
+
             title = FileExtensionRegex.Replace(title, m =>
             {
                 var extension = m.Value.ToLower();
