@@ -165,7 +165,7 @@ namespace NzbDrone.Core.MetadataSource.SkyHook
 
         public MovieCollection GetCollectionInfo(int tmdbId)
         {
-            var httpRequest = _radarrMetadata.Create()
+            var httpRequest = _whisparrMetadata.Create()
                                              .SetSegment("route", "movie/collection")
                                              .Resource(tmdbId.ToString())
                                              .Build();
@@ -184,6 +184,35 @@ namespace NzbDrone.Core.MetadataSource.SkyHook
                 else
                 {
                     throw new HttpException(httpRequest, httpResponse);
+                }
+            }
+
+            if (httpResponse.Resource.Parts.Where(m => m.Title.IsNotNullOrWhiteSpace()).Any())
+            {
+                httpResponse.Resource.Parts.ForEach(m => m.Adult = true);
+            }
+            else
+            {
+                httpRequest = _radarrMetadata.Create()
+                                                 .SetSegment("route", "movie/collection")
+                                                 .Resource(tmdbId.ToString())
+                                                 .Build();
+
+                httpRequest.AllowAutoRedirect = true;
+                httpRequest.SuppressHttpError = true;
+
+                httpResponse = _httpClient.Get<CollectionResource>(httpRequest);
+
+                if (httpResponse.HasHttpError)
+                {
+                    if (httpResponse.StatusCode == HttpStatusCode.NotFound)
+                    {
+                        throw new MovieNotFoundException(tmdbId);
+                    }
+                    else
+                    {
+                        throw new HttpException(httpRequest, httpResponse);
+                    }
                 }
             }
 
