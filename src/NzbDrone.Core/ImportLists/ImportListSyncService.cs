@@ -164,7 +164,14 @@ namespace NzbDrone.Core.ImportLists
             if (moviesToAdd.Any())
             {
                 _logger.ProgressInfo("Adding {0} movies from your auto enabled lists to library", moviesToAdd.Count);
-                _addMovieService.AddMovies(moviesToAdd, true);
+
+                // Chunk the into smaller lists
+                var chunkSize = 10;
+                var moviesLists = moviesToAdd.Chunk(chunkSize);
+                foreach (var moviesList in moviesLists)
+                {
+                    _addMovieService.AddMovies(moviesList.ToList(), true);
+                }
             }
         }
 

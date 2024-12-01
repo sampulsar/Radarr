@@ -7,6 +7,7 @@ using FluentValidation.Results;
 using NLog;
 using NzbDrone.Common.EnsureThat;
 using NzbDrone.Common.Extensions;
+using NzbDrone.Common.Http;
 using NzbDrone.Core.Exceptions;
 using NzbDrone.Core.MetadataSource;
 using NzbDrone.Core.Organizer;
@@ -63,6 +64,7 @@ namespace NzbDrone.Core.Movies
 
         public List<Movie> AddMovies(List<Movie> newMovies, bool ignoreErrors = false)
         {
+            var httpExceptionCount = 0;
             var added = DateTime.UtcNow;
             var moviesToAdd = new List<Movie>();
 
@@ -74,7 +76,7 @@ namespace NzbDrone.Core.Movies
                 }
                 else
                 {
-                    _logger.Info("Adding Movie {0} Path: [{1}]", m, m.Path);
+                _logger.Info("Adding Movie {0} Path: [{1}]", m, m.Path);
                 }
 
                 try
@@ -85,6 +87,7 @@ namespace NzbDrone.Core.Movies
                     movie.Added = added;
 
                     moviesToAdd.Add(movie);
+                    httpExceptionCount = 0;
                 }
                 catch (ValidationException ex)
                 {
@@ -93,11 +96,50 @@ namespace NzbDrone.Core.Movies
                         throw;
                     }
 
-                    _logger.Debug("TmdbId {0} was not added due to validation failures. {1}", m.TmdbId, ex.Message);
+                    _logger.Error("TmdbId {0} was not added due to validation failures. {1}", m.TmdbId, ex.Message);
+                }
+                catch (HttpException ex)
+                {
+                    if (!ignoreErrors)
+                    {
+                        throw;
+                    }
+
+                    httpExceptionCount++;
+
+                    // Throw exception on the two successive exception
+                    if (httpExceptionCount > 2)
+                    {
+                        throw;
+                    }
+
+                    _logger.Error("TmdbId  ID {0} was not added due to connection failures. {1}", m.TmdbId, ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    if (!ignoreErrors)
+                    {
+                        throw;
+                    }
+
+                    _logger.Error("TmdbId ID {0} was not added due to failures. {1}", m.TmdbId, ex.Message);
                 }
             }
 
-            _movieMetadataService.UpsertMany(moviesToAdd.Select(x => x.MovieMetadata.Value).ToList());
+            try
+            {
+                _movieMetadataService.UpsertMany(moviesToAdd.Select(x => x.MovieMetadata.Value).ToList());
+            }
+            catch (Exception ex)
+            {
+                if (!ignoreErrors)
+                {
+                    throw;
+                }
+
+                _logger.Debug("Failures adding metadata.", ex.Message);
+            }
+
             moviesToAdd.ForEach(x => x.MovieMetadataId = x.MovieMetadata.Value.Id);
 
             return _movieService.AddMovies(moviesToAdd);

@@ -127,16 +127,19 @@ namespace NzbDrone.Core.Movies
             {
                 var collectionMovies = _movieMetadataService
                     .GetMoviesByCollectionTmdbId(collection.TmdbId)
-                    .Where(m => m.Status is MovieStatusType.InCinemas or MovieStatusType.Released)
                     .ToList();
 
                 var existingMovies = _movieService.AllMovieTmdbIds();
                 var excludedMovies = _importListExclusionService.All().Select(e => e.TmdbId);
                 var moviesToAdd = collectionMovies.Where(m => !existingMovies.Contains(m.TmdbId)).Where(m => !excludedMovies.Contains(m.TmdbId)).ToList();
 
+                // Chunk the into smaller lists
+                var chunkSize = 10;
+                var moviesAdded = 0;
+
                 if (moviesToAdd.Any())
                 {
-                    _addMovieService.AddMovies(moviesToAdd.Select(m => new Movie
+                    var sceneLists = moviesToAdd.Select(m => new Movie
                     {
                         TmdbId = m.TmdbId,
                         Title = m.Title,
@@ -150,8 +153,15 @@ namespace NzbDrone.Core.Movies
                         },
                         Monitored = true,
                         Tags = collection.Tags
-                    }).ToList(), true);
+                    }).Chunk(chunkSize);
+
+                    foreach (var sceneList in sceneLists)
+                    {
+                        moviesAdded += _addMovieService.AddMovies(sceneList.ToList(), true).Count;
+                    }
                 }
+
+                _logger.Info("Synced Collection {0} has {1} movies adding {2} and added {3}", collection.Title, collectionMovies.Count, moviesToAdd.Count, moviesAdded);
             }
         }
 
