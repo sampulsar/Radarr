@@ -103,7 +103,7 @@ namespace NzbDrone.Core.MetadataSource.SkyHook
 
         public Tuple<MovieMetadata, List<Credit>> GetMovieInfo(int tmdbId)
         {
-            var httpRequest = _radarrMetadata.Create()
+            var httpRequest = _whisparrMetadata.Create()
                                              .SetSegment("route", "movie")
                                              .Resource(tmdbId.ToString())
                                              .Build();
@@ -122,6 +122,35 @@ namespace NzbDrone.Core.MetadataSource.SkyHook
                 else
                 {
                     throw new HttpException(httpRequest, httpResponse);
+                }
+            }
+
+            if (httpResponse.Resource.Title.IsNotNullOrWhiteSpace())
+            {
+                httpResponse.Resource.Adult = true;
+            }
+            else
+            {
+                httpRequest = _radarrMetadata.Create()
+                                             .SetSegment("route", "movie")
+                                             .Resource(tmdbId.ToString())
+                                             .Build();
+
+                httpRequest.AllowAutoRedirect = true;
+                httpRequest.SuppressHttpError = true;
+
+                httpResponse = _httpClient.Get<MovieResource>(httpRequest);
+
+                if (httpResponse.HasHttpError)
+                {
+                    if (httpResponse.StatusCode == HttpStatusCode.NotFound)
+                    {
+                        throw new MovieNotFoundException(tmdbId);
+                    }
+                    else
+                    {
+                        throw new HttpException(httpRequest, httpResponse);
+                    }
                 }
             }
 
@@ -271,6 +300,23 @@ namespace NzbDrone.Core.MetadataSource.SkyHook
             var certificationCountry = _configService.CertificationCountry.ToString();
 
             movie.Certification = resource.Certifications.FirstOrDefault(m => m.Country == certificationCountry)?.Certification;
+            if (resource.Adult)
+            {
+                movie.Certification = "XXX";
+            }
+
+            if (movie.Certification.IsNullOrWhiteSpace())
+            {
+                if (resource.Certifications.FirstOrDefault() != null)
+                {
+                    movie.Certification = resource.Certifications.First().Certification;
+                }
+                else
+                {
+                    movie.Certification = "NR";
+                }
+            }
+
             movie.Ratings = MapRatings(resource.MovieRatings) ?? new Ratings();
 
             movie.TmdbId = resource.TmdbId;
@@ -545,6 +591,8 @@ namespace NzbDrone.Core.MetadataSource.SkyHook
                 request.SuppressHttpError = true;
 
                 httpResponse = _httpClient.Get<List<MovieResource>>(request);
+                httpResponse.Resource.ForEach(x => x.Adult = true);
+
                 movieResources.AddRange(httpResponse.Resource);
 
                 return movieResources.SelectList(MapSearchResult);
