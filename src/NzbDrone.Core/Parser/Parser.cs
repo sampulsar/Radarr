@@ -58,7 +58,10 @@ namespace NzbDrone.Core.Parser
             new Regex(@"^(?<title>(?![(\[]).+?)?(?:(?:[-_\W](?<![)!]))*(?<year>(1(8|9)|20)\d{2}(?!p|i|\d+|\W\d+)))+(\W+|_|$)(?!\\)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
 
             // As a last resort for movies that have ( or [ in their title.
-            new Regex(@"^(?<title>.+?)?(?:(?:[-_\W](?<![)\[!]))*(?<year>(1(8|9)|20)\d{2}(?!p|i|\d+|\]|\W\d+)))+(\W+|_|$)(?!\\)", RegexOptions.IgnoreCase | RegexOptions.Compiled)
+            new Regex(@"^(?<title>.+?)?(?:(?:[-_\W](?<![)\[!]))*(?<year>(1(8|9)|20)\d{2}(?!p|i|\d+|\]|\W\d+)))+(\W+|_|$)(?!\\)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+
+            // Adult Content
+            new Regex(@"^(?<title>(?![(\[]).+?)?(XXX)(\W+|_|$)(?!\\)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
         };
 
         private static readonly Regex[] ReportMovieTitleFolderRegex = new[]
@@ -695,7 +698,7 @@ namespace NzbDrone.Core.Parser
                 n++;
             }
 
-            movieName = movieName.Trim(' ');
+            movieName = movieName.Trim(' ').TrimEnd("XXX").Trim(' ');
 
             int.TryParse(matchCollection[0].Groups["year"].Value, out var airYear);
 
