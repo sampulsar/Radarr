@@ -25,6 +25,12 @@ namespace NzbDrone.Core.Parser
 
         private static readonly Regex[] ReportMovieTitleRegex = new[]
         {
+            // Adult movie format, e.g: Studio.2024.Title.1080p-VERIFIED
+            new Regex(@"^(?<studio>(?![(\[]).+?)?(?:(?:[-_\W](?<![)\[!]))*(?<year>(1(8|9)|20)\d{2}(?!p|i|(1(8|9)|20)\d{2}|\]|\W(1(8|9)|20)\d{2})))+(\W+|_|$)(?!\\)(?<title>.*)\-VERIFIED", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+
+            // Adult movie format, e.g: [Studio] Title [2024]
+            new Regex(@"^(?:\[(?<studio>.+?)\][-_. ]?)(?<title>.*)(\[(?<year>(1(8|9)|20)\d{2})\])", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+
             // Anime [Subgroup] and Year
             new Regex(@"^(?:\[(?<subgroup>.+?)\][-_. ]?)(?<title>(?![(\[]).+?)?(?:(?:[-_\W](?<![)\[!]))*(?<year>(1(8|9)|20)\d{2}(?!p|i|x|\d+|\]|\W\d+)))+.*?(?<hash>\[\w{8}\])?(?:$|\.)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
 
@@ -48,6 +54,10 @@ namespace NzbDrone.Core.Parser
             /*new Regex(@"^(?<title>(?![(\[]).+?)?(?:(?:[-_\W](?<![)\[!]))*(?<year>(19|20)\d{2}(?!p|i|(19|20)\d{2}|\]|\W(19|20)\d{2})))+(\W+|_|$)(?!\\)\(?(?<edition>(((Extended.|Ultimate.)?(Director.?s|Collector.?s|Theatrical|Ultimate|Final(?=(.(Cut|Edition|Version)))|Extended|Rogue|Special|Despecialized|\d{2,3}(th)?.Anniversary)(.(Cut|Edition|Version))?(.(Extended|Uncensored|Remastered|Unrated|Uncut|IMAX|Fan.?Edit))?|((Uncensored|Remastered|Unrated|Uncut|IMAX|Fan.?Edit|Edition|Restored|((2|3|4)in1))))))\)?",
                           RegexOptions.IgnoreCase | RegexOptions.Compiled),*/
 
+            // Adult Content
+            new Regex(@"^(?<title>(?![(\[]).+?)(\W+|_|$)\(.+\).+?(XXX)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+            new Regex(@"^(?<title>(?![(\[]).+?)?(XXX)(\W+|_|$)(?!\\)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+
             // Normal movie format, e.g: Mission.Impossible.3.2011
             new Regex(@"^(?<title>(?![(\[]).+?)?(?:(?:[-_\W](?<![)\[!]))*(?<year>(1(8|9)|20)\d{2}(?!p|i|(1(8|9)|20)\d{2}|\]|\W(1(8|9)|20)\d{2})))+(\W+|_|$)(?!\\)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
 
@@ -59,9 +69,6 @@ namespace NzbDrone.Core.Parser
 
             // As a last resort for movies that have ( or [ in their title.
             new Regex(@"^(?<title>.+?)?(?:(?:[-_\W](?<![)\[!]))*(?<year>(1(8|9)|20)\d{2}(?!p|i|\d+|\]|\W\d+)))+(\W+|_|$)(?!\\)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
-
-            // Adult Content
-            new Regex(@"^(?<title>(?![(\[]).+?)?(XXX)(\W+|_|$)(?!\\)", RegexOptions.IgnoreCase | RegexOptions.Compiled),
         };
 
         private static readonly Regex[] ReportMovieTitleFolderRegex = new[]

@@ -596,7 +596,8 @@ namespace NzbDrone.Core.MetadataSource.SkyHook
 
                 var firstChar = searchTerm.First();
 
-                var request = _radarrMetadata.Create()
+                // Whisparr Search
+                var request = _whisparrMetadata.Create()
                     .SetSegment("route", "search")
                     .AddQueryParam("q", searchTerm)
                     .AddQueryParam("year", yearTerm)
@@ -606,10 +607,10 @@ namespace NzbDrone.Core.MetadataSource.SkyHook
                 request.SuppressHttpError = true;
 
                 var httpResponse = _httpClient.Get<List<MovieResource>>(request);
+                httpResponse.Resource.ForEach(x => x.Adult = true);
                 movieResources.AddRange(httpResponse.Resource);
 
-                // Whisparr Search
-                request = _whisparrMetadata.Create()
+                request = _radarrMetadata.Create()
                     .SetSegment("route", "search")
                     .AddQueryParam("q", searchTerm)
                     .AddQueryParam("year", yearTerm)
@@ -619,7 +620,6 @@ namespace NzbDrone.Core.MetadataSource.SkyHook
                 request.SuppressHttpError = true;
 
                 httpResponse = _httpClient.Get<List<MovieResource>>(request);
-                httpResponse.Resource.ForEach(x => x.Adult = true);
 
                 movieResources.AddRange(httpResponse.Resource);
 
