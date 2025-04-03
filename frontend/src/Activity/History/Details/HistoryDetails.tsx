@@ -18,6 +18,7 @@ import {
 } from 'typings/History';
 import formatDateTime from 'Utilities/Date/formatDateTime';
 import formatAge from 'Utilities/Number/formatAge';
+import formatBytes from 'Utilities/Number/formatBytes';
 import formatCustomFormatScore from 'Utilities/Number/formatCustomFormatScore';
 import translate from 'Utilities/String/translate';
 import styles from './HistoryDetails.css';
@@ -50,6 +51,7 @@ function HistoryDetails(props: HistoryDetailsProps) {
       ageHours,
       ageMinutes,
       publishedDate,
+      size,
     } = data as GrabbedHistoryData;
 
     const downloadClientNameInfo = downloadClientName ?? downloadClient;
@@ -160,12 +162,19 @@ function HistoryDetails(props: HistoryDetailsProps) {
             })}
           />
         ) : null}
+
+        {size ? (
+          <DescriptionListItem
+            title={translate('Size')}
+            data={formatBytes(size)}
+          />
+        ) : null}
       </DescriptionList>
     );
   }
 
   if (eventType === 'downloadFailed') {
-    const { message } = data as DownloadFailedHistory;
+    const { message, indexer } = data as DownloadFailedHistory;
 
     return (
       <DescriptionList>
@@ -179,6 +188,10 @@ function HistoryDetails(props: HistoryDetailsProps) {
           <DescriptionListItem title={translate('GrabId')} data={downloadId} />
         ) : null}
 
+        {indexer ? (
+          <DescriptionListItem title={translate('Indexer')} data={indexer} />
+        ) : null}
+
         {message ? (
           <DescriptionListItem title={translate('Message')} data={message} />
         ) : null}
@@ -187,7 +200,7 @@ function HistoryDetails(props: HistoryDetailsProps) {
   }
 
   if (eventType === 'downloadFolderImported') {
-    const { customFormatScore, droppedPath, importedPath } =
+    const { customFormatScore, droppedPath, importedPath, size } =
       data as DownloadFolderImportedHistory;
 
     return (
@@ -220,12 +233,19 @@ function HistoryDetails(props: HistoryDetailsProps) {
             data={formatCustomFormatScore(parseInt(customFormatScore))}
           />
         ) : null}
+
+        {size ? (
+          <DescriptionListItem
+            title={translate('FileSize')}
+            data={formatBytes(size)}
+          />
+        ) : null}
       </DescriptionList>
     );
   }
 
   if (eventType === 'movieFileDeleted') {
-    const { reason, customFormatScore } = data as MovieFileDeletedHistory;
+    const { reason, customFormatScore, size } = data as MovieFileDeletedHistory;
 
     let reasonMessage = '';
 
@@ -253,6 +273,13 @@ function HistoryDetails(props: HistoryDetailsProps) {
           <DescriptionListItem
             title={translate('CustomFormatScore')}
             data={formatCustomFormatScore(parseInt(customFormatScore))}
+          />
+        ) : null}
+
+        {size ? (
+          <DescriptionListItem
+            title={translate('FileSize')}
+            data={formatBytes(size)}
           />
         ) : null}
       </DescriptionList>
