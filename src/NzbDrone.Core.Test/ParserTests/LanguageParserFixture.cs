@@ -11,6 +11,8 @@ namespace NzbDrone.Core.Test.ParserTests
     public class LanguageParserFixture : CoreTest
     {
         [TestCase("Movie.Title.1994.English.1080p.XviD-LOL")]
+        [TestCase("Movie Title 1994 Eng 1080p XviD-GROUP")]
+        [TestCase("Movie Title 1994 EN 1080p XviD-GROUP")]
         public void should_parse_language_english(string postTitle)
         {
             var result = Parser.Parser.ParseMovieTitle(postTitle, true);
@@ -22,6 +24,7 @@ namespace NzbDrone.Core.Test.ParserTests
         [TestCase("Movie.Title.2018.2160p.WEBRip.x265.10bit.HDR.DD5.1-GASMASK")]
         [TestCase("Movie.Title.2010.720p.BluRay.x264.-[YTS.LT]")]
         [TestCase("Movie.Title.2010.SUBFRENCH.1080p.WEB.x264-GROUP")]
+        [TestCase("Movie.Title.2010.En.1080p.WEB.x264-GROUP")]
         public void should_parse_language_unknown(string postTitle)
         {
             var result = Parser.Parser.ParseMovieTitle(postTitle, true);
@@ -132,8 +135,8 @@ namespace NzbDrone.Core.Test.ParserTests
         }
 
         [TestCase("Movie.Title.1994.Japanese.1080p.XviD-LOL")]
-        [TestCase("Movie.Title (1988) 2160p HDR 5.1 Eng - Jpn x265 10bit")]
-        [TestCase("Movie Title (1985) (1080p.AC3 ITA-ENG-JPN)")]
+        [TestCase("Movie.Title (1988) 2160p HDR 5.1 Eng - Jap x265 10bit")]
+        [TestCase("Movie Title (1985) (1080p.AC3 ITA-ENG-JAP)")]
         public void should_parse_language_japanese(string postTitle)
         {
             var result = Parser.Parser.ParseMovieTitle(postTitle, true);

@@ -712,7 +712,7 @@ namespace NzbDrone.Core.MetadataSource.SkyHook
             var newAlternativeTitle = new AlternativeTitle
             {
                 Title = arg.Title,
-                SourceType = SourceType.TMDB,
+                SourceType = SourceType.Tmdb,
                 CleanTitle = arg.Title.CleanMovieTitle()
             };
 
