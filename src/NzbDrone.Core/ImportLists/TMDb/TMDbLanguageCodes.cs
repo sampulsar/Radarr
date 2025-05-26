@@ -71,6 +71,10 @@ namespace NzbDrone.Core.ImportLists.TMDb
         [FieldOption(Hint = "Tagalog")]
         tl,
         [FieldOption(Hint = "Urdu")]
-        ur
+        ur,
+        [FieldOption(Hint = "Raeto-Romance")]
+        rm,
+        [FieldOption(Hint = "Mongolian")]
+        mn
     }
 }

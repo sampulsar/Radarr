@@ -5374,6 +5374,29 @@
         }
       }
     },
+    "/api/v3/movie/{id}/folder": {
+      "get": {
+        "tags": [
+          "MovieFolder"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/v3/movie/import": {
       "post": {
         "tags": [
@@ -10801,7 +10824,8 @@
           },
           "customFormatScore": {
             "type": "integer",
-            "format": "int32"
+            "format": "int32",
+            "nullable": true
           },
           "indexerFlags": {
             "type": "integer",
@@ -10997,6 +11021,13 @@
             "nullable": true
           },
           "genres": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "keywords": {
             "type": "array",
             "items": {
               "type": "string"

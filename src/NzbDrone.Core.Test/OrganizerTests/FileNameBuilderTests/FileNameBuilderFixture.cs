@@ -400,10 +400,13 @@ namespace NzbDrone.Core.Test.OrganizerTests.FileNameBuilderTests
         [TestCase("rum", "RO")]
         [TestCase("per", "FA")]
         [TestCase("ger", "DE")]
+        [TestCase("gsw", "DE")]
         [TestCase("cze", "CS")]
         [TestCase("ice", "IS")]
         [TestCase("dut", "NL")]
         [TestCase("nor", "NO")]
+        [TestCase("khk", "MN")]
+        [TestCase("mvf", "MN")]
         public void should_format_languagecodes_properly(string language, string code)
         {
             _namingConfig.StandardMovieFormat = "{Movie.Title}.{MEDIAINFO.FULL}";

@@ -238,7 +238,7 @@
     "EnableColorImpairedMode": "Engedélyezze a színtévesztő módot",
     "System": "Rendszer",
     "SuggestTranslationChange": "Javasolj fordítási változtatást",
-    "SubfolderWillBeCreatedAutomaticallyInterp": "A(z) „{0}” almappa automatikusan létrehozásra kerül",
+    "AddNewMovieRootFolderHelpText": "A(z) „{0}” almappa automatikusan létrehozásra kerül",
     "Style": "Stílus",
     "Studio": "Stúdió",
     "Status": "Állapot",
@@ -907,7 +907,7 @@
     "NoResultsFound": "Nincs találat",
     "None": "Egyik sem",
     "NoMoviesExist": "Nem találhatóak filmek, kezdésnek adjon hozzá egy új filmet vagy importáljon már meglévőket.",
-    "MoveMovieFoldersDontMoveFiles": " Ne, magam mozgatom át a fájlokat",
+    "MoveMovieFoldersDontMoveFiles": "Nem, magam helyezem át a fájlokat",
     "NoListRecommendations": "Nincs elem a listában és az ajánlások között, kezdésnek adjon hozzá egy filmet, importáljon meglévőket, vagy adjon hozzá egy listát.",
     "NoLinks": "Nincsenek Linkek",
     "NoEventsFound": "Nem található események",
@@ -1501,5 +1501,7 @@
     "IndexerSettingsCategories": "Kategóriák",
     "IndexerSettingsMinimumSeeders": "Minimális Seederek Száma",
     "IndexerHDBitsSettingsCodecs": "Kodek",
-    "IndexerHDBitsSettingsMediums": "Közepes"
+    "IndexerHDBitsSettingsMediums": "Közepes",
+    "MyComputer": "A számítógépem",
+    "EditMovieCollectionModalHeader": "Szerkesztés – {title}"
 }
